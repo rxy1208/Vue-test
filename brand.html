@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link rel="stylesheet" href="./lib/bootstrap-3.3.7.css">
+  <script src="./vue.js"></script>
+</head>
+
+<body>
+  <div id="app">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h3 class="panel-title">添加品牌</h3>
+      </div>
+      <div class="panel-body form-inline">
+        <label>
+          Id:
+          <input type="text" class="form-control" v-model="id">
+        </label>
+
+        <label>
+          Name:
+          <input type="text" class="form-control" v-model="name">
+        </label>
+
+
+        <input type="button" value="添加" class="btn btn-primary" @click="add">
+
+        <label>
+          搜索名称关键字：
+          <input class="form-control" v-model="keywords" @keyup="search" v-focus>
+        </label>
+      </div>
+    </div>
+
+
+    <table class="table table-bordered table-hover table-striped">
+      <thead>
+        <tr>
+          <th>Id</th>
+          <th>Name</th>
+          <th>Ctime</th>
+          <th>Operation</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <tr v-for='item in search()' :key="item.id">
+          <td>{{item.id}}</td>
+          <td>{{item.name}}</td>
+          <td>{{item.ctime | dateFormat() }}</td>
+          <td>
+            <a href="#" @click.prevent="del(item.id)" v-color="'red'">删除</a>
+          </td>
+        </tr>
+
+      </tbody>
+    </table>
+
+  </div>
+
+
+</body>
+<script>
+  //定义全局获取焦点指令
+  Vue.directive('focus',{
+    inserted:function(el,binging){
+      el.focus();
+    }
+  }); 
+
+  var vm = new Vue({
+    el: '#app',
+    data: {
+      id: '',
+      name: '',
+      keywords: '',
+      list: [{
+          'id': 1,
+          'name': '拉法',
+          'ctime': new Date()
+        },
+        {
+          'id': 2,
+          'name': '大牛',
+          'ctime': new Date()
+        }
+      ],
+    },
+    methods: {
+      //新增功能
+      add: function () {
+        var id = this.id;
+        var name = this.name;
+        var list = this.list;
+        var date = {
+          'id': id,
+          'name': name,
+          'ctime': new Date()
+        };
+        list.push(date);
+        this.id = this.name = '';
+      },
+      //删除功能
+      del: function (id) {
+        for (var i = 0; i < this.list.length; i++) {
+          if (this.list[i].id == id) {
+            this.list.splice(i, 1);
+          }
+        }
+      },
+      //搜索功能
+      search: function () {
+        var newlist = [];
+        for (var i = 0; i < this.list.length; i++) {
+          if (this.list[i].name.includes(this.keywords)) {
+            newlist.push(this.list[i]);
+          }
+        }
+        return newlist;
+      },
+    },
+    //过滤器
+    filters: {
+      dateFormat: function (date, type = '') {
+        var date = new Date(date);
+        var year = date.getFullYear();
+        var month = date.getMonth() + 1;
+        var day = date.getDate();
+        if (type.toLowerCase() == 'yyyy-mm-dd') {
+          return `${year}-${month}-${day}`;
+        } else {
+          var hour = date.getHours();
+          var minute = date.getMinutes();
+          var second = date.getSeconds();
+          return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+        }
+      }
+    }, 
+
+    //自定义指令
+    directives:{
+      color:{
+        bind:function(el,binging){ 
+          el.style.color=binging.value;
+        },
+        inserted:function(el,binging){
+          el.style.color=binging.value;
+        },
+        update:function(el,binging){
+
+        }
+      },
+    },
+
+
+  });
+</script>
+
+</html>
